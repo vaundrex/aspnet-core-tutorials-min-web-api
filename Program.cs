@@ -11,11 +11,9 @@ var todoItems = app.MapGroup("/todoitems");
 
 app.MapGet("/", () => "Welcome to the Todo API");
 
-todoItems.MapGet("/", async (TodoDb db) => 
-    await db.Todos.ToListAsync());
+todoItems.MapGet("/", GetAllTodos);
 
-todoItems.MapGet("/complete", async (TodoDb db) => 
-    await db.Todos.Where(t => t.IsComplete).ToListAsync());
+todoItems.MapGet("/complete", GetCompleteTodos);
 
 todoItems.MapGet("/{id}", async Task<Results<Ok<Todo>, NotFound>> (int Id, TodoDb db) =>
     await db.Todos.FindAsync(Id)
@@ -24,7 +22,7 @@ todoItems.MapGet("/{id}", async Task<Results<Ok<Todo>, NotFound>> (int Id, TodoD
             : TypedResults.NotFound()
 );
 
-todoItems.MapPost("/", async (Todo todo, TodoDb db) =>
+todoItems.MapPost("/", async Task<IResult> (Todo todo, TodoDb db) =>
 {
     db.Todos.Add(todo);
     await db.SaveChangesAsync();
@@ -32,7 +30,7 @@ todoItems.MapPost("/", async (Todo todo, TodoDb db) =>
     return Results.Created($"/todoitems/{todo.Id}", todo);
 });
 
-todoItems.MapPut("/{id}", async (int id, Todo inputTodo, TodoDb db) =>
+todoItems.MapPut("/{id}", async Task<IResult> (int id, Todo inputTodo, TodoDb db) =>
 {
     var todo = await db.Todos.FindAsync(id);
     if (todo is null) return Results.NotFound();
@@ -45,9 +43,10 @@ todoItems.MapPut("/{id}", async (int id, Todo inputTodo, TodoDb db) =>
     return Results.NoContent();
 });
 
-todoItems.MapDelete("/{id}", async Task<Results<NoContent, NotFound>> (int id, TodoDb db) => 
+todoItems.MapDelete("/{id}", async Task<Results<NoContent, NotFound>> (int id, TodoDb db) =>
 {
-    if(await db.Todos.FindAsync(id) is Todo todo){
+    if (await db.Todos.FindAsync(id) is Todo todo)
+    {
         db.Todos.Remove(todo);
         await db.SaveChangesAsync();
         return TypedResults.NoContent();
@@ -57,3 +56,13 @@ todoItems.MapDelete("/{id}", async Task<Results<NoContent, NotFound>> (int id, T
 });
 
 app.Run();
+
+static async Task<IResult> GetAllTodos(TodoDb db)
+{
+    return TypedResults.Ok(await db.Todos.ToArrayAsync());
+}
+
+static async Task<IResult> GetCompleteTodos(TodoDb db)
+{
+    return TypedResults.Ok(await db.Todos.Where(t => t.IsComplete).ToArrayAsync());
+}
