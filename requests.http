@@ -35,6 +35,9 @@ content-type: application/json
   "isComplete": false
 }
 ###
-DELETE https://localhost:7135/todoitems/2
+DELETE https://localhost:7135/todoitems/1
+###
+GET https://localhost:7135/throw/
+
 
 
