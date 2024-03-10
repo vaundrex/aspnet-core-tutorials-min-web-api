@@ -4,18 +4,22 @@ using ToDoApi;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<TodoDb>(opt => opt.UseInMemoryDatabase("TodoList"));
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+// The developer exception page is enabled by default in the development environment for minimal API apps
+// https://learn.microsoft.com/en-us/aspnet/core/tutorials/min-web-api?view=aspnetcore-8.0&amp%3Btabs=visual-studio&tabs=visual-studio
+// builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
 // builder.Services.ConfigureHttpJsonOptions(options => {
 //     options.SerializerOptions.WriteIndented = true;
 //     // options.SerializerOptions.IncludeFields = true;
 // });
 var app = builder.Build();
 
+
 var todoItems = app.MapGroup("/todoitems");
 
 app.MapGet("/", () => "Welcome to the Todo API");
 
-app.MapGet("/throw", () => new Exception("Sample exception.")); 
+app.MapGet("/throw", () => new InvalidOperationException("Sample exception.")); 
 
 todoItems.MapGet("/", GetAllTodos);
 
