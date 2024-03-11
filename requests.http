@@ -1,1 +1,43 @@
 GET https://localhost:7135/
+
+###
+POST https://localhost:7135/todoitems/
+content-type: application/json
+
+{
+  "name":"walk dog",
+  "isComplete":true
+}
+###
+POST https://localhost:7135/todoitems/
+content-type: application/json
+
+{
+  "name":"mow lawn",
+  "isComplete":false
+}
+
+###
+GET https://localhost:7135/todoitems/
+###
+GET https://localhost:7135/todoitems/complete
+###
+GET https://localhost:7135/todoitems/2
+###
+GET https://localhost:7135/todoitems/
+###
+PUT https://localhost:7135/todoitems/2
+content-type: application/json
+
+{
+  "id": 2,
+  "name": "feed fish",
+  "isComplete": false
+}
+###
+DELETE https://localhost:7135/todoitems/1
+###
+GET https://localhost:7135/throw/
+
+
+
