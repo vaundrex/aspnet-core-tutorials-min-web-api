@@ -9,11 +9,11 @@ public static class TodoEndpoints
     
     public static RouteGroupBuilder MapTodoApi(this RouteGroupBuilder group)
     {
-        group.MapGet("/", async Task<IResult> (TodoDb db) => 
+        group.MapGet("/", async Task<Ok<TodoItemDTO[]>> (TodoDb db) => 
             TypedResults.Ok(await db.Todos.Select(t => new TodoItemDTO(t)).ToArrayAsync())
         );
 
-        group.MapGet("/complete", async Task<IResult> (TodoDb db) => 
+        group.MapGet("/complete", async Task<Ok<TodoItemDTO[]>> (TodoDb db) => 
             TypedResults.Ok(
                 await db.Todos
                 .Where(t => t.IsComplete)
@@ -27,7 +27,7 @@ public static class TodoEndpoints
                     : TypedResults.NotFound()
         );
 
-        group.MapPost("/", async Task<IResult> (TodoItemDTO todoItemDTO, TodoDb db) =>
+        group.MapPost("/", async Task<Created<Todo>> (TodoItemDTO todoItemDTO, TodoDb db) =>
         {
             var todo = new Todo{
                 Name = todoItemDTO.Name,
@@ -37,20 +37,20 @@ public static class TodoEndpoints
             db.Todos.Add(todo);
             await db.SaveChangesAsync();
 
-            return Results.Created($"/todoitems/{todo.Id}", todo);
+            return TypedResults.Created($"/todoitems/{todo.Id}", todo);
         });
 
-        group.MapPut("/{id}", async Task<IResult> (int id, TodoItemDTO todoItemDTO, TodoDb db) =>
+        group.MapPut("/{id}", async Task<Results<NotFound, NoContent>> (int id, TodoItemDTO todoItemDTO, TodoDb db) =>
         {
             var todo = await db.Todos.FindAsync(id);
-            if (todo is null) return Results.NotFound();
+            if (todo is null) return TypedResults.NotFound();
 
             todo.Name = todoItemDTO.Name;
             todo.IsComplete = todoItemDTO.IsComplete;
 
             await db.SaveChangesAsync();
 
-            return Results.NoContent();
+            return TypedResults.NoContent();
         });
 
         group.MapDelete("/{id}", async Task<Results<NoContent, NotFound>> (int id, TodoDb db) =>

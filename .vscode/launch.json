@@ -3,13 +3,8 @@
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
+    // https://github.com/dotnet/vscode-csharp/blob/1c11b4e4d/debugger-launchjson.md#launchsettingsjson-support
+    "launchSettingsProfile":"https",
     "configurations": [
-        {
-            "name": "C#: ToDoApi Debug",
-            "type": "dotnet",
-            "request": "launch",
-            "projectPath": "${workspaceFolder}/ToDoApi.csproj",
-        }
-
     ]
 }
